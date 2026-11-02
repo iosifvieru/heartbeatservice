@@ -2,22 +2,28 @@ package com.dpda;
 
 import java.io.IOException;
 import java.net.*;
+import java.time.LocalDateTime;
 
 public class MulticastClient extends Thread {
     private final String group;
     private final Integer port;
 
     private MulticastSocket socket;
+    private final Topology topology;
 
     private byte[] buffer;
     private final int bufSize;
 
     private boolean isRunning = true;
+    private int index;
 
     public MulticastClient(String group, int port){
         this.group = group;
         this.port = port;
         this.bufSize = 256;
+        this.index = 0;
+
+        this.topology = new Topology();
     }
 
     private void initClient() throws IOException {
@@ -37,10 +43,17 @@ public class MulticastClient extends Thread {
 
             while(isRunning){
                 socket.receive(packet);
-                String buf = new String(packet.getData(), packet.getOffset(), packet.getLength());
+                this.index += 1;
 
                 InetAddress addr = packet.getAddress();
-                System.out.println("buf: " + buf + "addr: " + addr.getHostAddress() + " port: " + packet.getPort());
+                topology.update(addr.getHostAddress(), packet.getPort());
+
+                System.out.println("Received message from: " + addr.getHostAddress() + ":" + packet.getPort() + " at: " + LocalDateTime.now());
+
+                if(index % 3 == 0){
+                    topology.cleanup();
+                    topology.print();
+                }
             }
 
             System.out.println("Client closed.");

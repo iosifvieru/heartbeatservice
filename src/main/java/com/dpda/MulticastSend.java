@@ -20,7 +20,7 @@ public class MulticastSend extends Thread {
     private void initSend() throws IOException {
         this.socket = new DatagramSocket();
 
-        String message = "Hello !";
+        String message = "Healthy!";
         this.packet = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(group), port);
 
         System.out.println("Server socket and packet initialized!");
@@ -32,7 +32,7 @@ public class MulticastSend extends Thread {
 
             while(true) {
                 socket.send(packet);
-                sleep(500);
+                sleep(2000);
             }
 
         } catch (Exception e){
