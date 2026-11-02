@@ -24,7 +24,7 @@ public class MulticastClient extends Thread {
         this.socket = new MulticastSocket(port);
         System.out.println("Multicast client socket initialized.");
 
-        socket.joinGroup(new InetSocketAddress(group, port), NetworkInterface.getByIndex(1));
+        socket.joinGroup(new InetSocketAddress(group, port), NetworkInterface.getByIndex(0));
 
         this.buffer = new byte[bufSize];
     }
@@ -38,12 +38,18 @@ public class MulticastClient extends Thread {
             while(isRunning){
                 socket.receive(packet);
                 String buf = new String(packet.getData(), packet.getOffset(), packet.getLength());
-                System.out.println(buf);
+
+                InetAddress addr = packet.getAddress();
+                System.out.println("buf: " + buf + "addr: " + addr.getHostAddress() + " port: " + packet.getPort());
             }
 
             System.out.println("Client closed.");
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (socket != null) {
+                socket.close();
+            }
         }
     }
 }

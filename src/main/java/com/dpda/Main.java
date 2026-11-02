@@ -1,7 +1,14 @@
 package com.dpda;
 
 public class Main {
+    private final static String GROUP = "230.0.0.2";
+    private final static int PORT = 4446;
+
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        MulticastClient client = new MulticastClient(GROUP, PORT);
+        MulticastSend server = new MulticastSend(GROUP, PORT);
+
+        client.start();
+        server.start();
     }
 }
