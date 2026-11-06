@@ -12,6 +12,9 @@ public class MulticastSend extends Thread {
     private DatagramSocket socket;
     private DatagramPacket packet;
 
+    private Topology topology;
+    private int index = 0;
+
     public MulticastSend(String group, int port){
         this.group = group;
         this.port = port;
@@ -24,6 +27,14 @@ public class MulticastSend extends Thread {
         this.packet = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(group), port);
 
         System.out.println("Server socket and packet initialized!");
+
+        if(topology == null){
+            this.topology = new Topology();
+        }
+    }
+
+    public void setTopology(Topology topology){
+        this.topology = topology;
     }
 
     public void run() {
@@ -32,6 +43,16 @@ public class MulticastSend extends Thread {
 
             while(true) {
                 socket.send(packet);
+
+                if(index % 3 == 0) {
+                    this.topology.cleanup();
+                    this.topology.print();
+
+                    this.index = 0;
+                }
+
+                this.index += 1;
+
                 sleep(2000);
             }
 
